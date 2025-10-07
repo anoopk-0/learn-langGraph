@@ -1,0 +1,25 @@
+# Basic dependencies llm
+langgraph
+langchain
+typing
+langchain-ollama
+langchain-community
+langmem
+
+# MCP adapters
+langchain-mcp-adapters
+fastmcp
+
+# Embedding and vector store
+langchain-chroma
+pypdf
+sentence-transformers
+pymongo
+chromadb
+
+# tokinizer
+transformers 
+sentencepiece
+
+# BM25
+rank_bm25
