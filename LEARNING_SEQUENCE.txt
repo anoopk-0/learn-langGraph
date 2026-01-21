@@ -1,0 +1,155 @@
+LangGraph Learning Sequence
+============================
+
+Follow this sequence to learn LangGraph concepts in order:
+
+
+1. GRAPH BASICS (01-graph-basics/)
+   ├── graph-api/
+   │   ├── state.py              - Core state definition with TypedDict and reducers
+   │   ├── node.py               - Node creation and functionality
+   │   ├── edge.py               - Edge connections between nodes
+   │   ├── graph.py              - Graph assembly and compilation
+   │   ├── messages.py           - Message handling in workflows
+   │   ├── command.py            - Command patterns and control flow
+   │   ├── durability.py         - Persistence and durability concepts
+   │   └── prompt_engineering.py - Prompt engineering best practices
+   └── graph-utils/
+       ├── typing.py             - Type definitions and utilities
+       └── lambda.py             - Lambda functions for node logic
+
+
+2. GRAPH PATTERNS (02-graph-patterns/)
+   ├── sequential.py   - Running nodes one after another
+   ├── parallel.py     - Running nodes in parallel
+   ├── conditional.py  - Conditional routing and branching
+   ├── looping.py      - Loops and iterative patterns
+   └── retry.py        - Retry mechanisms for fault tolerance
+
+
+3. GRAPH STREAMING (03-graph-streaming/)
+   ├── stream_events.py          - Streaming events from graph execution
+   ├── astream_events.py         - Async streaming of events
+   └── note_graph_streaming.md   - Streaming concepts and best practices
+
+
+4. GRAPH PERSISTENCE (04-graph-persistence/)
+   ├── Short-term Memory (short_term_memory/)
+   │   ├── inmemorysaver_checkpointer.py - In-memory checkpointing
+   │   ├── mongodb_checkpointer.py       - MongoDB-based checkpointing
+   │   └── notes_checkpointers.md        - Checkpointer concepts
+   └── Long-term Memory (long_term_memory/)
+       ├── inmemorystore.py                      - In-memory storage
+       ├── hybrid_inmemorystore_chroma.py        - Hybrid storage with Chroma
+       └── notes_long_term_memory.md             - Long-term memory patterns
+
+
+5. GRAPH TOOLS (05-graph-tools/)
+   ├── build_in_tool_node.py   - Using built-in tools in nodes
+   ├── custom_tool_node.py     - Creating custom tools
+   └── notes_graph_tools.md    - Tool integration patterns
+
+
+6. GRAPH MCP (06-graph-mcp/)
+   ├── clinet.py                 - MCP client implementation
+   ├── servers/
+   │   ├── api_server.py         - API-based MCP server
+   │   ├── internal_server.py    - Internal MCP server
+   │   ├── localhost_server.py   - Local development server
+   │   ├── mongodb_server.py     - MongoDB-backed MCP server
+   │   └── notes_mcp_server.md   - MCP server concepts
+   └── notes_mcp.md              - Model Context Protocol overview
+
+
+7. GRAPH VECTOR DB (07-graph-vectordb/)
+   ├── graph_chromadb.py            - Integration with Chroma vector database
+   └── notes_vector_chormadb.md     - Vector database concepts
+   └── notes_vectordb.md            - Vector DB best practices
+
+
+8. GRAPH HUMAN-IN-THE-LOOP (08-graph-human-in-loop/)
+   ├── basic_input.py                   - Basic user input handling
+   ├── interrupt.py                     - Interrupting graph execution
+   ├── interrupt_before.py              - Pre-execution interrupts
+   ├── multiturn.py                     - Multi-turn interactions
+   ├── notes_human_in_the_loop.md       - Human-in-the-loop patterns
+   └── notes_interrupt.md               - Interrupt handling
+
+
+9. GRAPH MULTIAGENT (09-graph-multiagent/)
+   ├── supervisor_multiagent.py  - Supervisor pattern for multiple agents
+   ├── subgraphs/
+   │   ├── subgraph.py           - Nested graph implementation
+   │   └── notes_subgraph.md     - Subgraph concepts
+   └── notes_multi_agent.md      - Multi-agent orchestration
+
+
+10. GRAPH CONTEXT MANAGEMENT (10-graph-context/)
+    ├── trimming.py                - Context trimming and compression
+    ├── summarization.py           - Message summarization
+    ├── notes_context.md           - Context management patterns
+    ├── notes_sliding_window.md    - Sliding window approach
+    └── notes_tokens.md            - Token counting and limits
+
+
+11. GRAPH RAG (11-graph-rag/)
+    ├── ingestion_pipline.py           - Building RAG pipelines
+    ├── multi_query_retriever.py       - Multi-query retrieval
+    ├── hybrid_search.py               - Hybrid search techniques
+    ├── market_stock_agent.py          - Example: Market/stock agent
+    ├── market_stock_agent_rerank.py   - Agent with reranking
+    ├── notes_rag.md                   - RAG fundamentals
+    ├── notes_chunk.md                 - Document chunking strategies
+    ├── notes_retriever.md             - Retriever patterns
+    ├── notes_rerank_chunks.md         - Reranking techniques
+    ├── note_bm25.md                   - BM25 search method
+    └── notes_reciprocal_rank_funsion.md - RRF technique
+
+
+RECOMMENDED STUDY PATH:
+========================
+
+Beginner:
+  1. Start with 01-graph-basics (state, nodes, edges, graph)
+  2. Move to 02-graph-patterns (sequential, parallel, conditional)
+  3. Learn 03-graph-streaming
+  4. Explore 04-graph-persistence
+
+Intermediate:
+  5. Study 05-graph-tools
+  6. Learn 08-graph-human-in-loop
+  7. Understand 10-graph-context
+
+Advanced:
+  8. Explore 06-graph-mcp
+  9. Learn 09-graph-multiagent
+  10. Study 07-graph-vectordb
+
+Specialized:
+  11. Master 11-graph-rag (Retrieval Augmented Generation)
+
+
+QUICK REFERENCE:
+=================
+
+Core Concepts:
+  • State: Data structure holding workflow context
+  • Node: Processing unit in the graph
+  • Edge: Connection between nodes
+  • Graph: Assembled workflow
+
+Common Patterns:
+  • Sequential: Chain nodes in order
+  • Parallel: Run nodes concurrently
+  • Conditional: Branch based on state
+  • Loop: Repeat until condition met
+  • Retry: Repeat on failure
+
+Advanced Features:
+  • Streaming: Real-time event access
+  • Persistence: Save/restore execution state
+  • Tools: External function integration
+  • Human-in-loop: User interaction points
+  • Multi-agent: Multiple autonomous agents
+  • RAG: Retrieval Augmented Generation
+  • MCP: Model Context Protocol integration
