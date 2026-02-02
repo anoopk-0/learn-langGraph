@@ -1,18 +1,18 @@
 """
-# In LangGraph, a node is a function that performs a unit of work in the workflow.
-# Each node receives the current state, does some logic or side-effect, and returns an updated state.
-# Nodes can represent agent actions, tool calls, or any computation.
-# You add nodes to the graph and connect them with edges to define the workflow steps.
+In LangGraph, a node is a function that performs a unit of work in the workflow. Each node receives the current state, does some logic or side-effect, and returns an updated state.
 
+Nodes can represent agent actions, tool calls, or any computation.
+
+NOTE: A Node in LangGraph is a function that transforms state and represents one step in your AI workflow.
 """
+
 from typing import TypedDict, Annotated
 import operator
 
-# Example state schema for nodes to use
 class AgentState(TypedDict):
     messages: Annotated[list, operator.add]
 
-# Example node: Greets the user
+# node 1: Greets the user
 def greet_node(state: AgentState) -> AgentState:
     """
     This node adds a greeting message to the state.
@@ -21,7 +21,7 @@ def greet_node(state: AgentState) -> AgentState:
     new_message = "Hello! How can I assist you today?"
     return {"messages": [new_message]}
 
-# Example node: Processes a search query
+# node 2: Processes a search query
 def search_node(state: AgentState) -> AgentState:
     """
     This node simulates a search based on the last user message.
@@ -45,3 +45,16 @@ def search_node(state: AgentState) -> AgentState:
 # 4. If no search is needed, finish after greet_node.
 #
 # Nodes are functions; edges define transitions.
+
+"""
+In LangGraph, a ToolNode is a special type of node designed to execute tools (functions, APIs, or utilities) that an LLM decides to call.
+"""
+
+from langgraph.prebuilt import ToolNode
+from langchain.tools import tool
+
+@tool
+def add(a: int, b: int) -> int:
+    return a + b
+
+tool_node = ToolNode([add])

@@ -1,26 +1,22 @@
 """
-Durable execution in LangGraph enables workflows to persist their state at key points, allowing them to pause and resume reliably. This is essential for long-running tasks, human-in-the-loop scenarios, and robust error recovery.
+Durable execution allows a LangGraph workflow to save its state and resume from where it stopped. This makes workflows reliable even if they are interrupted, paused, or crash.
 
-Durability Modes:
-    - "exit": Saves state only at workflow completion (success or error). Fastest, but progress is lost if interrupted mid-execution. Suitable for short, non-critical workflows. It is the default mode.
-    - "async": Saves state asynchronously during execution. Balances speed and reliability, but may lose recent progress if a crash occurs before the save completes.
-    - "sync": Saves state synchronously before each step. Most reliable—every step is checkpointed. Recommended for production and critical workflows.
+> Save progress → Stop → Resume later
 
-Why Use Durability?
-    - Enables recovery from failures, interruptions, or manual pauses.
-    - Supports human-in-the-loop workflows: users can inspect or modify state before resuming.
-    - Prevents loss of progress in long-running or expensive operations.
+Durability Modes
+- `exit`: Saves state only when the workflow exits. If interrupted, progress since the last exit is lost.
+- `async`: Saves state asynchronously during execution. Minimizes lost progress if interrupted, but mayhave slight delays.
+- `sync`: Saves state synchronously at each step. Ensures no progress is lost if interrupted, but may slow down execution.
 
-Production Best Practices:
+NOTE: langGraph achieves durability through Checkpointers, which handle saving and loading workflow state.
+
+Recommendations:
     - Prefer "sync" durability for critical workflows to avoid data loss.
     - Always configure a checkpointer and unique thread ID.
     - Encapsulate side-effect and non-deterministic operations in nodes for consistent replay.
     - Ensure side-effect operations are idempotent to prevent duplication on retries.
-
-Summary:
-    - Durability modes let you choose between performance and reliability. For production, "sync" is recommended. LangGraph’s persistence ensures workflows are robust, resumable, and fault-tolerant.
 """
-# Example (StateGraph with Durability Modes)
+
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import InMemorySaver

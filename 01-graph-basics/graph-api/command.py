@@ -1,7 +1,8 @@
 """
-LangGraph enables you to update graph state and control flow simultaneously by returning a `Command` object from node functions.
-This approach allows you to specify both the next node and any state changes in a single return value.
+In LangGraph, a `Command` is a special object that lets a node explicitly control what happens next in the graph.
+It can be used to update the graph's state, navigate to specific nodes, resume execution after interrupts, and switch between graphs (e.g., parent and subgraphs).
 
+A Command can include the following parameters:
     - update: Dict of state changes to apply immediately.
     - goto: Name(s) of the next node(s) to execute (string, list, or Send objects).
     - resume: Mapping of interrupt_id → value to resume execution after an interrupt.
@@ -36,32 +37,24 @@ def my_node(state) -> Command[Literal["my_other_node"]]:
         return Command(update={"foo": "baz"}, goto="my_other_node")
     # Optionally, handle other cases or return a default Command if needed
 
-"""
-NOTE: When to Use Command vs. Conditional Edges
-Use `Command` when you need to both update the graph state and route to a different node (e.g., multi-agent handoffs).
-Use conditional edges to route between nodes conditionally **without** updating the state.
-"""
 
-## Navigating to a Node in a Parent Graph (Subgraphs)
-# If you are using subgraphs, you can navigate from a node within a subgraph to a node in the parent graph by specifying `graph=Command.PARENT`:
+# Navigating to a Node in a Parent Graph (Subgraphs). If you are using subgraphs, you can navigate from a node within a subgraph to a node in the parent graph by specifying `graph=Command.PARENT`:
 
+"""
+NOTE:
+Setting `graph` to `Command.PARENT` navigates to the closest parent graph.
+If you update a key shared by both parent and subgraph state schemas, you must define a reducer for that key in the parent graph state.
+"""
 def my_node(state) -> Command[Literal["other_subgraph"]]:
     return Command(
         update={"foo": "bar"},
         goto="other_subgraph",  # Node in the parent graph
         graph=Command.PARENT
     )
-    
-    
-"""
-NOTE:
-Setting `graph` to `Command.PARENT` navigates to the closest parent graph.
-If you update a key shared by both parent and subgraph state schemas, you must define a reducer for that key in the parent graph state.
-"""
 
 # Example: Multi-Agent Handoff
-# In multi-agent scenarios, you may want to transfer control and state to another agent node.
-# Use Command to update the state (e.g., mark a handoff) and route to the target agent.
+
+# In multi-agent scenarios, you may want to transfer control and state to another agent node. Use Command to update the state (e.g., mark a handoff) and route to the target agent.
 def agent_handoff(state) -> Command[Literal["agent_b"]]:
     # Indicate a handoff and route to agent_b
     return Command(
@@ -70,8 +63,8 @@ def agent_handoff(state) -> Command[Literal["agent_b"]]:
     )
 
 # Example: Using Command Inside Tools
-# Tools can update the graph state and control flow after performing an operation.
-# For example, after looking up customer information, update the state and route to the next node.
+
+# Tools can update the graph state and control flow after performing an operation. For example, after looking up customer information, update the state and route to the next node.
 def lookup_customer(state) -> Command[Literal["next_node"]]:
     # Simulate fetching customer information (replace with actual lookup logic)
     customer_info = {"name": "Alice", "id": 1234}
@@ -82,6 +75,7 @@ def lookup_customer(state) -> Command[Literal["next_node"]]:
 
 
 # Human-in-the-Loop Workflows with Command and Interrupts
+
 def request_approval(state) -> Command[Literal["process_approval"]]:
     """
     Triggers an interrupt for human approval.
@@ -94,3 +88,10 @@ resume_values = {"approval_request": "Approved"}  # User feedback
 # Resume graph execution with the provided feedback
 app.invoke(Command(resume=resume_values), config=config)
 # The graph continues from the point of interruption using the feedback.
+
+"""
+NOTE: When to Use Command vs. Conditional Edges
+
+Use `Command` when you need to both update the graph state and route to a different node (e.g., multi-agent handoffs).
+Use conditional edges to route between nodes conditionally **without** updating the state.
+"""

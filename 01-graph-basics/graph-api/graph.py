@@ -1,7 +1,5 @@
 """
-Defines the structure and workflow of a LangGraph graph, including nodes, state, edges, and conditional logic.
-
-A Graph in LangGraph organizes the flow of data and decisions, showing the sequence and conditional paths between operations.
+NOTE: A LangGraph Graph defines the overall structure of an application by organizing state, nodes, edges, and conditional routing. It governs how data flows and how decisions are made across different steps in the workflow.
 """
 
 from langgraph.graph import StateGraph, END

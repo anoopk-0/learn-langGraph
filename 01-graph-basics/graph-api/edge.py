@@ -1,16 +1,16 @@
 """
-# Edges in LangGraph define the transitions between nodes, controlling the workflow's path.
-# You can add direct edges (always go to the next node) or conditional edges (branch based on state).
+Edges in LangGraph define the transitions between nodes, controlling the workflow's path.
+You can add direct edges (always go to the next node) or conditional edges (branch based on state).
 
 
-# Types of Edges:
-# 1. Direct Edge: Always goes from one node to another.
-# 2. Conditional Edge: Uses a routing function to decide which node(s) to run next based on the current state.
-# 3. Entry/Exit Edges: Connect the graph's start and end points.
-#
-#   [START] --> [greet_node] --(if 'search' in message)--> [search_node] --> [END]
-#                        \--(else)-----------------------> [END]
-#
+Types of Edges:
+1. Direct Edge: Always goes from one node to another.
+2. Conditional Edge: Uses a routing function to decide which node(s) to run next based on the current state.
+3. Entry/Exit Edges: Connect the graph's start and end points.
+
+  [START] --> [greet_node] --(if 'search' in message)--> [search_node] --> [END]
+                       |
+                       +--(else)-----------------------> [END]
 """
 
 from langgraph.graph import StateGraph, END
