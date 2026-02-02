@@ -1,57 +1,109 @@
-import sqlite3
-from langchain.chat_models import init_chat_model
-from langgraph.graph import END, MessagesState, StateGraph, START
+"""
+Retry:
+Retry means automatically running a failed operation again instead of stopping the program.
+
+Why Retry is Needed:
+Sometimes a step fails because of temporary issues (network glitch, timeout, API error).
+Retry allows the system to try again without crashing.
+
+RetryPolicy:
+RetryPolicy defines the rules for retrying a failed node.
+
+Main RetryPolicy Options:
+- max_attempts → How many times to try again
+- retry_on → Which exceptions should trigger retry
+- backoff_factor → Delay growth between retries
+
+Example:
+RetryPolicy(max_attempts=3, retry_on=(Exception,))
+
+Meaning:
+Try up to 3 times when any exception occurs.
+
+How Retry Works in LangGraph:
+- Node runs
+- If exception occurs → retry
+- If still fails → retry again (until max_attempts)
+- If still failing → graph stops with error
+
+Important Rule:
+Retry happens only when a node raises an exception.
+
+Where RetryPolicy is Applied:
+RetryPolicy is attached to a node when adding it to the graph.
+
+graph.add_node("node_name", node_function, retry=retry_policy)
+
+One-Line Summary:
+RetryPolicy makes LangGraph nodes fault-tolerant by automatically re-running them when errors happen.
+"""
+
+from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
 from langgraph.types import RetryPolicy
-from langchain_community.utilities import SQLDatabase
-from langchain_core.messages import AIMessage
-from langchain_ollama import ChatOllama
 
-# Initialize the database and model
-db = SQLDatabase.from_uri("sqlite:///:memory:")
-modal = ChatOllama(model="llama3.2:3b", temperature=0, streaming=True)
+# ---- State ----
+class AgentState(TypedDict):
+    number: int
 
-def query_database(state: MessagesState):
-    """
-    Query the database.
-    This function may raise sqlite3.OperationalError, which we want to retry on.
-    """
-    query_result = db.run("SELECT * FROM Artist LIMIT 10;")
-    return {"messages": [AIMessage(content=query_result)]}
 
-def call_model(state: MessagesState):
-    """
-    Call the LLM model.
-    This function may fail transiently, so we set a max retry attempts.
-    """
-    response = model.invoke(state["messages"])
-    return {"messages": [response]}
+# ---- Global failure flag ----
+fail_once = True
 
-# Build the workflow graph
-builder = StateGraph(MessagesState)
 
-# Add nodes with retry policies
-builder.add_node(
-    "query_database",
-    query_database,
-    retry_policy=RetryPolicy(retry_on=sqlite3.OperationalError),  # Retry only on OperationalError
+# ---- Nodes ----
+def print_node(state: AgentState):
+    print(f"number is {state['number']}")
+    return {}
+
+
+def decrement_node(state: AgentState):
+    global fail_once
+
+    if fail_once:
+        fail_once = False
+        print("❌ Simulated failure")
+        raise ValueError("temporary failure")
+
+    print("✅ decrement_node succeeded")
+    return {"number": state["number"] - 1}
+
+
+def check_node(state: AgentState):
+    if state["number"] == 0:
+        return "stop"
+    return "loop"
+
+
+# ---- Retry Policy (IMPORTANT FIX) ----
+retry_policy = RetryPolicy(
+    max_attempts=3,
+    retry_on=(Exception,)
 )
 
-# RetryPolicy options:
-# - max_attempts: Sets how many times to retry (default: 3)
-# - retry_on: Specify exception(s) to trigger a retry (default: Exception)
-# - backoff_factor: Controls exponential backoff timing (default: 1), which means the wait time between retries increases exponentially.
-#  ==> For example, with backoff_factor=2, the delay doubles after each failed attempt.
 
-builder.add_node(
-    "model",
-    call_model,
-    retry_policy=RetryPolicy(max_attempts=5),  # Retry up to 5 times on most exceptions
+# ---- Graph ----
+graph = StateGraph(AgentState)
+
+graph.add_node("print_node", print_node, retry=retry_policy)
+graph.add_node("decrement_node", decrement_node, retry=retry_policy)
+
+graph.add_edge(START, "print_node")
+
+graph.add_conditional_edges(
+    "print_node",
+    check_node,
+    {
+        "loop": "decrement_node",
+        "stop": END
+    }
 )
 
-# Define workflow edges
-builder.add_edge(START, "model")
-builder.add_edge("model", "query_database")
-builder.add_edge("query_database", END)
+graph.add_edge("decrement_node", "print_node")
 
-# Compile the graph
-graph = builder.compile()
+app = graph.compile()
+
+
+# ---- Run ----
+result = app.invoke({"number": 5})
+print("Final:", result)
